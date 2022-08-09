@@ -12,16 +12,30 @@ class QuestionController extends AbstractController
     #Afficher toutes les questions
     public function index()
     {
+        if (isset($_GET['title'])) {
+            $title = $_GET['title'];
+        }
+        else {
+            $title = '';
+        }
 
+        if (isset($_GET['order'])) {
+            $order = $_GET['order'];
+        }
+        else {
+            $order = 'DESC';
+        }
+        
         $questionModel = new QuestionModel();
         $userModel = new UserModel();
-        
-        $questions = $questionModel->findAll();
+        $questions = $questionModel->findAll($title, $order);
         $users = $userModel->findAll();
 
         $this->render('questions/allQuestions.php', [
             'questions' => $questions,
-            'users' => $users
+            'users' => $users,
+            'order' => $order,
+            'title' => $title
         ]);
 
     }
@@ -67,6 +81,7 @@ class QuestionController extends AbstractController
         if (isset($_POST['title']) && isset($_SESSION['id']))
         {
             $title = $_POST['title'];
+
             if (isset($_POST['content'])) {
                 $content = $_POST['content'];
             }
@@ -88,16 +103,50 @@ class QuestionController extends AbstractController
             {
                 $questionModel = new QuestionModel();
                 $questionId = $questionModel->create($title, $content, $technology, $userId);
-
+                
                 // Redirection sur la page de la nouvelle question
                 header('location:?page=question&id='.$questionId);
             }
         }
-
+        
         $this->render('questions/ask.php', [
-            'title' => $title,
-            'content' => $content
         ]);
     }
 
+
+    #Clôturer une question
+    public function close()
+    {
+        if (isset($_GET['id'])) {
+            $questionModel = new QuestionModel();
+            $questionModel->close($_GET['id']);
+
+            // Redirection sur la page d'accueil'
+            header('location:?page=admin');
+        }
+    }
+
+    #Réouvrir une question
+    public function publish()
+    {
+        if (isset($_GET['id'])) {
+            $questionModel = new QuestionModel();
+            $questionModel->publish($_GET['id']);
+
+            // Redirection sur la page d'accueil'
+            header('location:?page=admin');
+        }
+    }
+
+    #Modérer une question
+    public function moderate()
+    {
+        if (isset($_GET['id'])) {
+            $questionModel = new QuestionModel();
+            $questionModel->moderate($_GET['id']);
+
+            // Redirection sur la page d'accueil'
+            header('location:?page=admin');
+        }
+    }
 }

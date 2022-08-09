@@ -2,27 +2,7 @@
 require_once './src/View/includes/header.inc.php';
 ?>
 
-<h1 class="text-center">Toutes les questions</h1>
-
-<div class="text-center">
-    <a href="?page=ask" class="btn btn-primary mb-3">Poser une question</a>
-</div>
-
-<hr/>
-
-<div class="d-flex justify-content-center">
-    <form action="" method="get" class="form-inline">
-        <input class="form-control mr-sm-4" name="title" type="search" placeholder="Rechercher..."
-            <?php if ($title) { echo 'value="'.$title.'"'; } ?> aria-label="Search">
-
-        <label>Trier : </label>
-        <select name="order" class="ml-1">
-            <option value="DESC" <?php if ($order == 'DESC') { echo 'selected'; } ?>>Plus récent</option>
-            <option value="ASC" <?php if ($order == 'ASC') { echo 'selected'; } ?>>Plus ancien</option>
-        </select>
-        <button type="submit" class="btn btn-success ml-2">Recherche</button>
-    </form>
-</div>
+<h1 class="text-center">Tableau de bord</h1>
 
 
 
@@ -41,21 +21,24 @@ require_once './src/View/includes/header.inc.php';
                     if ($question->getStatus() == 'closed') {
                         ?> - <i class="fas fa-lock"></i> Cette question est clôturée<?php
                     }
-
-                    if ($question->getTechnology()) {
-                        ?>
-                        <div>
-                            <div class="btn btn-primary tag"><?= $question->getTechnology() ?></div>
-                        </div>
-                        <?php
+                    
+                    if ($question->getStatus() == 'moderated') {
+                        ?> - <i class="fas fa-window-close"></i> Cette question est modérée et masquée<?php
                     }
-                
+                    
                     
                     if ($question->getStatus() == 'published') {
                         ?><a href="?page=questionClose&id=<?= $question->getId() ?>"><i class="fas fa-lock"></i> Clôturer</a><?php
                     }
-                    else {
+                    elseif ($question->getStatus() == 'closed') {
                         ?><a href="?page=questionPublish&id=<?= $question->getId() ?>"><i class="fas fa-unlock"></i> Réouvrir</a><?php
+                    }
+
+                    if ($question->getStatus() != 'moderated') {
+                        ?> <a href="?page=questionModerate&id=<?= $question->getId() ?>"><i class="fas fa-window-close ml-2"></i> Modérer</a><?php
+                    }
+                    elseif ($question->getStatus() == 'moderated') {
+                        ?> <a href="?page=questionPublish&id=<?= $question->getId() ?>"><i class="fas fa-user ml-2"></i> Republier</a><?php
                     }
                     ?>
                     
@@ -64,6 +47,7 @@ require_once './src/View/includes/header.inc.php';
         </a>
     </div>
 <?php endforeach ?>
+
 
 <?php
 

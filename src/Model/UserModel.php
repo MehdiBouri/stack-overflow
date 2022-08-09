@@ -86,14 +86,16 @@ class UserModel
 
     public function login($email, $password)
     {
-        $sql = 'SELECT
+        $sql = "SELECT
                 `email`
                 ,`password`
                 ,`id`
-                FROM ' . self::TABLE_NAME . '
-                WHERE email = "'. $email. '" AND password = "'. $password . '"';
+                FROM ". self::TABLE_NAME ."
+                WHERE email = '".$email."' AND password = :password";
         
-        $pdoStatement = $this->pdo->query($sql);
+        $pdoStatement = $this->pdo->prepare($sql);
+        $pdoStatement->bindValue('password', $password, PDO::PARAM_STR);
+        $pdoStatement->execute();
         
         $result = $pdoStatement->fetchAll(PDO::FETCH_CLASS, self::class);
         
@@ -101,7 +103,7 @@ class UserModel
             return false;
         }
 
-        return $result;
+        return $result[0];
     }
 
     public function isLogged()
@@ -109,8 +111,9 @@ class UserModel
         if (isset($_SESSION['id']))
         {
             $sql = 'SELECT
-                    `email`
-                    ,`nickname`
+                    `email`,
+                    `nickname`,
+                    `status`
                     FROM ' . self::TABLE_NAME . '
                     WHERE id = '. $_SESSION['id'];
             

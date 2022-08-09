@@ -23,8 +23,6 @@ class UserController extends AbstractController
             #Vérification de l'existence de l'utilisateur en BDD
             $result = $user->login($email, $password);
 
-            $result = $result[0];
-
             #S'il y a un resultat, alors on stocke dans $_SESSION
             if($result){
                 

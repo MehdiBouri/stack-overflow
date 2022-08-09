@@ -10,23 +10,29 @@ require_once './src/View/includes/header.inc.php';
 
     <form action="" method="POST">
         <div class="py-2">
-            <input class="form-control" type="text" name="title" placeholder="Title">
+            <input class="form-control" type="text" name="title" placeholder="Titre">
         </div>
 
         <div class="md-form amber-textarea active-amber-textarea">
-            <textarea placeholder="Your Question" id="content" class="md-textarea form-control" rows="3"></textarea>
+            <textarea placeholder="Votre question..." id="content" name="content" class="md-textarea form-control" rows="3"></textarea>
         </div>
 
         <div class="py-2">
-            <input class="form-control" type="text" name="technology" placeholder="Technology">
+            <input class="form-control" type="text" name="technology" placeholder="Technologie">
         </div>
 
-        <div class="d-flex pb-4">
-            <?php if ($user) {
-                ?><button type="submit" class="btn btn-primary btnSubmit">Post Your Answer</button><?php
+        <div>
+            <?php
+            if ($user) {
+                ?><button type="submit" class="btn btn-primary">Envoyer la question</button><?php
             }
             else {
-                ?><button type="submit" class="btn btn-primary btnSubmit" disabled>Login to ask a Question</button><?php
+                ?>
+                <button type="submit" class="btn mb-3" disabled>Envoyer la question</button>
+                <div>
+                    <a href="?page=login" class="btn btn-primary mb-4">Se connecter pour poser une question</a>
+                </div>
+                <?php
             }
             ?>
         </div>

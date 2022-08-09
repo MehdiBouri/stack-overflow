@@ -4,31 +4,37 @@ namespace App\Controller;
 
 use App\Controller\AbstractController;
 use App\Model\AnswerModel;
+use App\Model\QuestionModel;
 use DateTime;
 
 class AnswerController extends AbstractController
 {
 
-    #Créer un commentaire
+    // Ajouter une réponse
     public function create()
     {
-        // je récupère mes info 
-        // soumis en javascript
+        // Si l'utilisateur est connecté
         if (isset($_SESSION['id']))
         {
+            // Récupération des données
             $answerContent = $_POST['answerContent'];
-            $questionId = $_POST['questionId'];
+            $questionId = $_GET['questionId'];
             $userId = $_SESSION['id'];
 
-            // Je crée une réponse
-            $answerModel = new AnswerModel();
-            $newContent = $answerModel->create($answerContent, $userId, $questionId);
+            // Récupère la question
+            $questionModel = new QuestionModel();
+            $question = $questionModel->findById($questionId);
 
-            // je renvoie l'id de la liste en json
-            $this->sendJson([
-                'content' => $newContent
-            ]);
+            // Vérifie que la question n'est pas clôturée
+            if ($question->getStatus() == 'published') {
+                // Ajout de la réponse
+                $answerModel = new AnswerModel();
+                $answerModel->create($answerContent, $userId, $questionId);
+            }
         }
+
+        // Redirection vers la nouvelle question
+        header('location:?page=question&id='.$questionId);
     }
 
 }

@@ -29,17 +29,21 @@ $user = $userModel->isLogged();
 <body>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="?page=index"><img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/f/f7/Stack_Overflow_logo.png" alt="stackoverflow image"></a>
-        <form class="form-inline">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
     
-        <?php if(isset($_SESSION['id'])) :?>
+        <?php if ($user) :?>
             <div>
                 <span><?= ucfirst($user->getNickname()) ?></span>
-                <a href="?page=logout"><i class="fas fa-sign-out-alt"></i></a>
+                <a href="?page=logout"><i class="fas fa-power-off"></i></a>
             </div>
         <?php else :?>
         <a href="?page=login"><i class="fas fa-user"></i></a>
         <?php endif ?>
+
+
+        <?php if ($user && $user->getStatus()) {
+            ?><a href="?page=admin">Tableau de bord</a><?php
+        }
+        ?>
     </nav>
+
+    <div id="content">

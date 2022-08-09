@@ -39,8 +39,33 @@ class QuestionModel
     }
 
     #Récupérer toutes les questions
-    public function findAll()
+    public function findAll($title = '', $order = 'DESC', $admin = false)
     {
+        if ($title) {
+            $sqlTitle = ' title LIKE :sqlValueTitle OR technology LIKE :sqlValueTitle ';
+        }
+        else {
+            $sqlTitle = '';
+        }
+
+        if (!$admin) {
+            $sqlAdmin = " status != 'moderated'";
+
+            if ($title) {
+                $sqlAdmin = ' AND '.$sqlAdmin;
+            }
+        }
+        else {
+            $sqlAdmin = '';
+        }
+
+        if ($title || !$admin) {
+            $sqlWhere = ' WHERE ';
+        }
+        else {
+            $sqlWhere = '';
+        }
+
         $sql = 'SELECT
                 `id`
                 ,`title`
@@ -49,11 +74,17 @@ class QuestionModel
                 ,`technology`
                 ,`created_at`
                 ,`user_id`
-                FROM ' . self::TABLE_NAME . '
-                ORDER BY `id` ASC;
-        ';
+                FROM ' . self::TABLE_NAME . $sqlWhere . $sqlTitle . $sqlAdmin.'
+                ORDER BY `created_at` '.$order;
+        
+                
+        $pdoStatement = $this->pdo->prepare($sql);
+        if ($title) {
+            $pdoStatement->bindValue('sqlValueTitle', '%'.$title.'%', PDO::PARAM_STR);
+        }
+        $result = $pdoStatement->execute();
 
-        $pdoStatement = $this->pdo->query($sql);
+
         $result = $pdoStatement->fetchAll(PDO::FETCH_CLASS, self::class);
 
         foreach($result as $r) {
@@ -109,7 +140,8 @@ class QuestionModel
         $pdoStatement = $this->pdo->query($sql);
         $question = $pdoStatement->fetchObject(self::class);
         $question->setCreatedAt($question->created_at);
-
+        $question->setUserId($question->user_id);
+        
         return $question;
     }
 
@@ -136,6 +168,46 @@ class QuestionModel
         }
 
         return $this->pdo->lastInsertId();
+    }
+
+
+    #Clôturer une question
+    public function close($id)
+    {
+        $sql = 'UPDATE '.self::TABLE_NAME.'
+        SET status = "closed"
+        WHERE id = '.$id;
+        
+        $pdoStatement = $this->pdo->prepare($sql);
+        $result = $pdoStatement->execute();
+        
+        return $result;
+    }
+
+    #Réouvrir une question
+    public function publish($id)
+    {
+        $sql = 'UPDATE '.self::TABLE_NAME.'
+        SET status = "published"
+        WHERE id = '.$id;
+        
+        $pdoStatement = $this->pdo->prepare($sql);
+        $result = $pdoStatement->execute();
+        
+        return $result;
+    }
+
+    #Modérer/masquer une question
+    public function moderate($id)
+    {
+        $sql = 'UPDATE '.self::TABLE_NAME.'
+        SET status = "moderated"
+        WHERE id = '.$id;
+        
+        $pdoStatement = $this->pdo->prepare($sql);
+        $result = $pdoStatement->execute();
+        
+        return $result;
     }
     
     

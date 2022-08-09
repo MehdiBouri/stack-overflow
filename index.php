@@ -32,9 +32,25 @@ class Application
             'controller' => 'QuestionController',
             'method' => 'index'
         ],
+        'admin' => [
+            'controller' => 'AdminController',
+            'method' => 'index'
+        ],
         'question' => [
             'controller' => 'QuestionController',
             'method' => 'showQuestion'
+        ],
+        'questionClose' => [
+            'controller' => 'QuestionController',
+            'method' => 'close'
+        ],
+        'questionPublish' => [
+            'controller' => 'QuestionController',
+            'method' => 'publish'
+        ],
+        'questionModerate' => [
+            'controller' => 'QuestionController',
+            'method' => 'moderate'
         ],
         'answer' => [
             'controller' => 'AnswerController',
